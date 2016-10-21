@@ -3829,3 +3829,18 @@
 	body.is-mobile.landing #footer {
 		background-color: #1d242a;
 	}
+
+  .prof-pic {
+    float: left;
+    margin-right: 100px;
+    border-radius: 400px;
+  }
+
+  .prog-lag {
+    float: left;
+  }
+
+  .lang-pic {
+    height: 200px;
+    width: 200px;
+  }
