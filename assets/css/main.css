@@ -2308,7 +2308,8 @@
 		input[type="button"].special,
 		button.special,
 		.button.special {
-			background-color: #ed4933;
+			/*background-color: #ed4933;*/
+			background-color: #222222;
 			box-shadow: none !important;
 			color: #ffffff !important;
 		}
@@ -2318,7 +2319,8 @@
 			input[type="button"].special:hover,
 			button.special:hover,
 			.button.special:hover {
-				background-color: #ef5e4a !important;
+				/*background-color: #ef5e4a !important;*/
+				background-color: #444444 !important;
 			}
 
 			input[type="submit"].special:active,
@@ -2326,7 +2328,8 @@
 			input[type="button"].special:active,
 			button.special:active,
 			.button.special:active {
-				background-color: #eb341c !important;
+				/*background-color: #eb341c !important;*/
+				background-color: #777777 !important;
 			}
 
 		input[type="submit"].disabled, input[type="submit"]:disabled,
@@ -3448,6 +3451,20 @@
 			#banner p a {
 				color: inherit;
 			}
+
+
+
+		#banner .icons {
+			font-size: 1.25em;
+		}
+
+			#banner .icons a {
+				color: rgba(255, 255, 255, 0.5);
+			}
+
+				#banner .icons a:hover {
+					color: #fff;
+				}
 
 		#banner .more {
 			-moz-transition: -moz-transform 0.75s ease, opacity 0.75s ease;
