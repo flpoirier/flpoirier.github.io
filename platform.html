@@ -115,8 +115,10 @@
         }
 
         let dist = 450;
-
-        while (dist >= 0) {
+        let tempRed;
+        let tempGreen;
+        
+        while (dist >= 0 || (tempRed != red && tempGreen != green)) {
 
           let tempRed = red - dist + Math.floor(300*sunY/500);
           if (tempRed < red) {
