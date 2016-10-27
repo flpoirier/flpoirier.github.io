@@ -40,7 +40,8 @@
         let starX = getRandomInt(0, canvasWidth);
         let starY = getRandomInt(-canvasHeight, 2 * canvasHeight / 3);
         let starRad = getRandomInt(1,3);
-        stars.push([starX, starY, starRad]);
+        let starSpeed = getRandomInt(1,15);
+        stars.push([starX, starY, starRad, starSpeed]);
       }
 
       var red = 85;
@@ -149,8 +150,7 @@
           //   falling += 1;
           // }
           stars.forEach((star) => {
-            let speed = getRandomInt(0,15);
-            star[1] += speed;
+            star[1] += star[3];
           });
         }
 
