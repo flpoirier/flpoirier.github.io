@@ -51,10 +51,10 @@
       function skyColored(r, g) {
         let redDiff = Math.abs(red - r);
         let greenDiff = Math.abs(green - g);
-        if (redDiff > 5 && greenDiff > 5) {
-          return false;
-        } else {
+        if (redDiff === 0 && greenDiff === 0) {
           return true;
+        } else {
+          return false;
         }
       }
       
