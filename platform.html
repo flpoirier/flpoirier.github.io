@@ -48,6 +48,16 @@
       var green = 200;
       var blue = 255;
 
+      function skyColored(r, g) {
+        let redDiff = Math.abs(red - r);
+        let greenDiff = Math.abs(green - g);
+        if (redDiff > 5 && greenDiff > 5) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      
       function draw() {
 
         sunset += 1;
@@ -117,7 +127,7 @@
         let tempRed = 255;
         let tempGreen = 255;
         
-        while (dist >= 0 && (tempRed - 5 > red && tempGreen - 5 > green)) {
+        while (dist >= 0 && !skyColored(tempRed, tempGreen)) {
 
           tempRed = red - dist + Math.floor(300*sunY/500);
           if (tempRed < red) {
