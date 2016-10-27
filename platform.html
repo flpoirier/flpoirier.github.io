@@ -21,6 +21,17 @@
       var sunY = sunRad;
       var sunset = 0;
 
+      var bridgeX = canvasWidth / 2;
+      var bridgeY = canvasHeight + 400;
+      var bridgeRad = canvasWidth * 2/3;
+
+      var asteroidColors = ["red", "orange", "yellow", "green", "blue", "purple"];
+      var asteroidSpeed = 15;
+      var asteroidRad = 10;
+      var asteroidX = getRandomInt(0, canvasWidth);
+      var asteroidY = -1 * asteroidRad;
+      var asteroidCol = asteroidColors[getRandomInt(0, asteroidColors.length)];
+
       var dudeX = 40;
       var dudeHeight = 75;
       var dudeDx = 1;
@@ -34,8 +45,11 @@
 
       var jumping = false;
       var jumpHeight = 0;
-      var jumpSpeed = 2;
+      var jumpSpeed = 3;
       var maxJump = 80;
+
+      var maxTime = 15;
+      var time = maxTime;
 
       var gameStarting = true;
       var gameOver = false;
@@ -207,10 +221,6 @@
         //   });
         // }
 
-        let bridgeX = canvasWidth / 2;
-        let bridgeY = canvasHeight + 400;
-        let bridgeRad = canvasWidth * 2/3;
-
         ctx.strokeStyle = "#7b9095";
         ctx.lineWidth = 15;
         ctx.beginPath();
@@ -244,6 +254,25 @@
         ctx.lineTo(dudeX - dudeHeight * Math.cos(dudeAngle), dudeY - dudeHeight * Math.sin(dudeAngle));
         ctx.stroke();
 
+        ctx.fillStyle = asteroidCol;
+        ctx.beginPath();
+        ctx.arc(asteroidX, asteroidY, asteroidRad, 0, 2 * Math.PI);
+        ctx.fill();
+
+        asteroidY += asteroidSpeed;
+
+        if (asteroidY > canvasHeight + asteroidRad) {
+          asteroidX = getRandomInt(0, canvasWidth);
+          asteroidY = -asteroidRad;
+          asteroidCol = asteroidColors[getRandomInt(0, asteroidColors.length)];
+        }
+
+        // put this back in once I fix time rendering
+
+        // ctx.fillStyle = "#7b9095";
+        // ctx.font = "30px serif";
+        // ctx.fillText(`${timeString()}`, 40, 60);
+
         // if (gameStarting) {
         //   dudeX += dudeDx;
         // }
@@ -260,8 +289,10 @@
 
         if (dudeX > canvasWidth - 40) {
           dudeX = canvasWidth - 40;
+          // starMove("right");
         } else if (dudeX < 40) {
           dudeX = 40;
+          // starMove("left");
         }
 
         // jumping logic
@@ -270,16 +301,41 @@
           jumping = true;
         }
 
-        if (jumping && jumpHeight < maxJump) {
+        // if (jumping && jumpHeight < maxJump) {
+        //   jumpHeight += jumpSpeed;
+        // } else if (jumping && jumpHeight === maxJump) {
+        //   jumping = false;
+        // } else if (!jumping && jumpHeight > 0) {
+        //   jumpHeight -= 2 * jumpSpeed;
+        // }
+
+        // jump height proportional to length of time space bar pressed
+
+        if (spacePressed && jumpHeight < maxJump) {
           jumpHeight += jumpSpeed;
-        } else if (jumping && jumpHeight === maxJump) {
-          jumping = false;
-        } else if (!jumping && jumpHeight > 0) {
+        } else if (!spacePressed && jumpHeight > 0) {
           jumpHeight -= 2 * jumpSpeed;
         }
 
       }
 
+      // function starMove(direction) {
+      //   if (direction === "left") {
+      //     stars.forEach((star) => {
+      //       star.starX -= 1;
+      //       let translatedX = 0;
+      //       if (star.starX < bridgeX) {
+      //         translatedX = -(bridgeX - star.starX);
+      //       } else if (star.starX > bridgeX) {
+      //         translatedX = star.starX - bridgeX;
+      //       }
+      //       let starAngle = Math.PI - Math.acos(translatedX / bridgeRad);
+      //       star.starY = bridgeY - Math.floor(bridgeRad * Math.sin(starAngle));
+      //     });
+      //   } else if (direction === "right") {
+      //
+      //   }
+      // }
 
       function keyDownHandler(e) {
         if(e.keyCode == 39) {
@@ -317,9 +373,36 @@
         }
       }
 
+      function timeTick() {
+        if (time > 0) {
+          time -= 1;
+        }
+      }
+
+      function timeString() {
+        let mins = Math.floor(time / 60);
+        let secs = time - (mins * 60);
+        if (mins === 0) {
+
+
+          mins = "00";
+        } else {
+          mins = `0${mins}`;
+        }
+        if (secs === 0) {
+          secs = "00";
+        } else if (secs < 10) {
+          secs = `0${mins}`;
+        } else if (secs > 10) {
+          secs = `${secs}`;
+        }
+        return `${mins}:${secs}`;
+      }
+
       document.addEventListener("keydown", keyDownHandler, false);
       document.addEventListener("keyup", keyUpHandler, false);
-      setInterval(draw, 15);
+      setInterval(draw, 30);
+      setInterval(timeTick, 1000);
 
     </script>
   </body>
