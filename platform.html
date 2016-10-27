@@ -114,16 +114,16 @@
         }
 
         let dist = 450;
-        let tempRed;
-        let tempGreen;
+        let tempRed = 255;
+        let tempGreen = 255;
         
         while (dist >= 0 && (tempRed - 5 > red && tempGreen - 5 > green)) {
 
-          let tempRed = red - dist + Math.floor(300*sunY/500);
+          tempRed = red - dist + Math.floor(300*sunY/500);
           if (tempRed < red) {
             tempRed = red;
           }
-          let tempGreen = green - dist + Math.floor(175*sunY/500);
+          tempGreen = green - dist + Math.floor(175*sunY/500);
           if (tempGreen < green) {
             tempGreen = green;
           }
