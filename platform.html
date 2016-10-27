@@ -127,7 +127,7 @@
         let tempRed = 255;
         let tempGreen = 255;
         
-        while (dist >= 0 && !skyColored(tempRed, tempGreen)) {
+        while (dist >= 0) {
 
           tempRed = red - dist + Math.floor(300*sunY/500);
           if (tempRed < red) {
@@ -141,10 +141,12 @@
           // if (tempBlue < blue) {
           //   tempBlue = blue;
           // }
-          ctx.fillStyle = `rgb(${tempRed},${tempGreen},${blue})`;
-          ctx.beginPath();
-          ctx.arc(sunX, sunY, dist, 0, 2 * Math.PI);
-          ctx.fill();
+          if (!skyColored(tempRed, tempGreen)) {
+            ctx.fillStyle = `rgb(${tempRed},${tempGreen},${blue})`;
+            ctx.beginPath();
+            ctx.arc(sunX, sunY, dist, 0, 2 * Math.PI);
+            ctx.fill();
+          }
 
           dist -= 3;
         }
