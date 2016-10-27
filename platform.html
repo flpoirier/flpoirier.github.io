@@ -102,16 +102,14 @@
             twinkle = 0;
           }
 
-          if (twinkle <= 500) {
-            stars.forEach((star) => {
-              // let stardist = distance(star[0],star[1],sunX, sunY);
-              // ctx.fillStyle = `rgba(255,255,255,${stardist/1000})`;
-              ctx.fillStyle = "white";
-              ctx.beginPath();
-              ctx.arc(star[0], star[1], star[2], 0, 2 * Math.PI);
-              ctx.fill();
-            });
-          }
+          stars.forEach((star) => {
+            // let stardist = distance(star[0],star[1],sunX, sunY);
+            // ctx.fillStyle = `rgba(255,255,255,${stardist/1000})`;
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(star[0], star[1], star[2], 0, 2 * Math.PI);
+            ctx.fill();
+          });
         }
 
         let dist = 450;
@@ -153,10 +151,6 @@
           stars.forEach((star) => {
             let speed = getRandomInt(0,15);
             star[1] += speed;
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.arc(star[0], star[1], star[2], 0, 2 * Math.PI);
-            ctx.fill();
           });
         }
 
