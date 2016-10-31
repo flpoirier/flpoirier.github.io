@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Sunset</title>
+    <title>Sunset Boulevard</title>
     <style>
       * { padding: 0; margin: 0; }
       canvas { display: block; margin: 0 auto; }
@@ -36,8 +36,14 @@
           let asteroidCollisionPoint = bridgeCollisionPoint(asteroidX);
           let asteroidFalling = true;
           let asteroidRolling = false;
+          let asteroidDx;
+          if (asteroidX > canvasWidth / 2) {
+            asteroidDx = asteroidSpeed;
+          } else {
+            asteroidDx = -asteroidSpeed;
+          }
           asteroids.push({X: asteroidX, Y: asteroidY, color: asteroidCol,
-            collisionPoint: asteroidCollisionPoint, falling: asteroidFalling, rolling: asteroidRolling});
+            collisionPoint: asteroidCollisionPoint, falling: asteroidFalling, rolling: asteroidRolling, dX: asteroidDx});
         }
       }
 
@@ -262,7 +268,7 @@
 
           } else if (asteroid.rolling) {
 
-            asteroid.X -= Math.floor(asteroidSpeed / 2);
+            asteroid.X += Math.floor(asteroid.dX / 2);
 
             let translatedAstX = 0;
             if (asteroid.X < bridgeX) {
