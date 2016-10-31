@@ -3846,3 +3846,26 @@
     height: 200px;
     width: 200px;
   }
+
+/*
+  #banner .inner {
+    margin: 0 auto;
+    padding-top: 40px;
+    color: #751524;
+    background: rgba(255, 255, 255, 0.75);
+    border: 5px solid #6d3107;
+    border-radius: 10px;
+    width: 640px;
+  }
+
+  #banner h2 {
+    color: #6c5a10;
+  }
+
+  #banner .icons a {
+    color: #3A5F0B;
+  }
+
+    #banner .icons a:hover {
+      color: #fff;
+    }*/
