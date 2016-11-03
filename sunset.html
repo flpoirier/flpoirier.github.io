@@ -25,6 +25,7 @@
       var asteroidSpeed = 20;
       var asteroidRad = 10;
       var asteroidPush = 60;
+      var intersectionMaxTime = 15;
       var asteroids = [];
 
       function asteroidConstructor() {
@@ -33,17 +34,22 @@
           let asteroidY = -1 * asteroidRad;
           // let asteroidCol = asteroidColors[getRandomInt(0, asteroidColors.length)];
           let asteroidCol = "#292e37";
+          let intersectingColor = "red";
           let asteroidCollisionPoint = bridgeCollisionPoint(asteroidX);
           let asteroidFalling = true;
           let asteroidRolling = false;
-          let asteroidDx;
-          if (asteroidX > canvasWidth / 2) {
-            asteroidDx = asteroidSpeed;
-          } else {
-            asteroidDx = -asteroidSpeed;
-          }
-          asteroids.push({X: asteroidX, Y: asteroidY, color: asteroidCol,
-            collisionPoint: asteroidCollisionPoint, falling: asteroidFalling, rolling: asteroidRolling, dX: asteroidDx});
+          let asteroidIntersecting = false;
+          let intersectingTimer = 0;
+          // let asteroidDx;
+          // if (asteroidX > canvasWidth / 2) {
+          //   asteroidDx = asteroidSpeed;
+          // } else {
+          //   asteroidDx = -asteroidSpeed;
+          // }
+          let asteroidDx = -asteroidSpeed;
+          asteroids.push({X: asteroidX, Y: asteroidY, color: asteroidCol, intersectingColor: intersectingColor,
+            collisionPoint: asteroidCollisionPoint, falling: asteroidFalling, rolling: asteroidRolling,
+            intersecting: asteroidIntersecting, intersectingTimer: intersectingTimer, dX: asteroidDx});
         }
       }
 
@@ -82,6 +88,7 @@
       var dudeX = endMargin;
       var dudeY;
       var dudeHeight = 75;
+      var dudeRad = 15;
       var dudeDx = 1;
       var walkSpeed = 2;
 
@@ -93,7 +100,7 @@
 
       var jumping = false;
       var jumpHeight = 0;
-      var jumpSpeed = 3;
+      var jumpSpeed = 5;
       var maxJump = 80;
 
       function getRandomInt(min, max) {
@@ -122,8 +129,14 @@
 
       function collisionChecker() {
         asteroids.forEach((asteroid) => {
-          if ((Math.floor(distance(asteroid.X, asteroid.Y, dudeX, dudeY)) + 2) < asteroidRad) {
+          if (asteroid.intersecting && asteroid.intersectingTimer < intersectionMaxTime) {
+            asteroid.intersectingTimer += 1;
+          } else if (asteroid.intersecting && asteroid.intersectingTimer === intersectionMaxTime) {
+            asteroid.intersecting = false;
+            asteroid.intersectingTimer = 0;
+          } else if ((Math.floor(distance(asteroid.X, asteroid.Y, dudeX, dudeY)) + 2) < asteroidRad && !asteroid.intersecting) {
             dudeX -= asteroidPush;
+            asteroid.intersecting = true;
           }
         });
       }
@@ -239,19 +252,28 @@
         //   dudeXDraw -= jumpHeight;
         // }
 
-        dudeY = bridgeY - Math.floor(bridgeRad * Math.sin(dudeAngle)) - jumpHeight - 8;
+        dudeY = bridgeY - Math.floor(bridgeRad * Math.sin(dudeAngle)) - jumpHeight - dudeRad;
 
-        ctx.strokeStyle = "purple";
-        ctx.lineWidth = 4;
+        // ctx.strokeStyle = "purple";
+        // ctx.lineWidth = 4;
+        // ctx.beginPath();
+        // ctx.moveTo(dudeX, dudeY);
+        // ctx.lineTo(dudeX - dudeHeight * Math.cos(dudeAngle), dudeY - dudeHeight * Math.sin(dudeAngle));
+        // ctx.stroke();
+
+        ctx.fillStyle = "purple"
         ctx.beginPath();
-        ctx.moveTo(dudeX, dudeY);
-        ctx.lineTo(dudeX - dudeHeight * Math.cos(dudeAngle), dudeY - dudeHeight * Math.sin(dudeAngle));
-        ctx.stroke();
+        ctx.arc(dudeX, dudeY, dudeRad, 0, 2 * Math.PI);
+        ctx.fill();
 
 
         asteroids.forEach((asteroid) => {
 
-          ctx.fillStyle = asteroid.color;
+          if (!asteroid.intersecting) {
+            ctx.fillStyle = asteroid.color;
+          } else {
+            ctx.fillStyle = asteroid.intersectingColor;
+          }
           ctx.beginPath();
           ctx.arc(asteroid.X, asteroid.Y, asteroidRad, 0, 2 * Math.PI);
           ctx.fill();
@@ -278,7 +300,7 @@
             }
 
             let asteroidAngle = Math.PI - Math.acos(translatedAstX / bridgeRad);
-            asteroid.Y = bridgeY - Math.floor(bridgeRad * Math.sin(asteroidAngle)) - 10;
+            asteroid.Y = bridgeY - Math.floor(bridgeRad * Math.sin(asteroidAngle)) - asteroidRad;
 
           }
 
@@ -324,7 +346,7 @@
           gameOver = true;
           gameWon = true;
         } else if (dudeX >= endPoint) {
-          dudeX = endMargin;
+          dudeX = endPoint;
         } else if (dudeX < endMargin) {
           dudeX = endMargin;
         }
@@ -355,6 +377,10 @@
         } else if (!spacePressed && jumpHeight > 0) {
           jumpHeight -= 2 * jumpSpeed;
         }
+
+      }
+
+      function gameOverScreen() {
 
       }
 
