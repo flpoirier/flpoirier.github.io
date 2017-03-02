@@ -1600,6 +1600,10 @@
 		float: right;
 	}
 
+	.sitelinks > a {
+		color: black;
+	}
+
 	.siteinfo {
 		/*color: #ee7600;*/
 		line-height: normal;
@@ -1629,6 +1633,10 @@
 		line-height: normal;
 	}
 
+	#work > p > a {
+		color: black;
+	}
+
 	#me header > div {
 		position: absolute;
 		left: 0;
@@ -1640,5 +1648,9 @@
 	}
 
 	#me header > div > a {
+		color: black;
+	}
+
+	#contact > header > a {
 		color: black;
 	}
