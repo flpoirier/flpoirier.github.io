@@ -62,8 +62,15 @@
 								<p>
 									I'm a software developer with experience in Ruby on Rails, JavaScript, and React.js. I like learning new things, solving problems, and challenging myself (and I actually enjoy debugging).
 									<br><br>
-									When I'm not refactoring a project or browsing Stack Overflow, I enjoy playing board games, trying new restaurants, and exploring the secret green areas of New York. If you have a job opportunity, or if you just want to chat, take a look at my <a href="Feather Poirier Resume.pdf">résumé</a> or send me an <a href="#contact">email</a>.
+									When I'm not refactoring a project or browsing Stack Overflow, I enjoy playing board games, trying new restaurants, and exploring the secret green areas of New York. If you have a job opportunity, or if you just want to chat, take a look at my <a href="Feather Poirier Resume.pdf">résumé</a> or send me a <span id="emailbutton">message</span>.
 									<br><br>
+									<script>
+										let button = document.getElementById("emailbutton");
+										button.onclick = () => {
+											window.location.replace("http://flpoirier.com/#contact");
+											window.location.reload();
+										};
+									</script>
 									<!-- <hr> -->
 									<strong>Skills:</strong> &nbsp&nbsp&nbsp Ruby / Rails / JavaScript / React / Redux / SQL / HTML / CSS / jQuery / Git
 								</p>

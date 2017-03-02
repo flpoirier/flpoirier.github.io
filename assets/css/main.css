@@ -1654,3 +1654,12 @@
 	#contact > header > a {
 		color: black;
 	}
+
+	#emailbutton {
+		text-decoration: underline;
+		color: black;
+	}
+
+	#emailbutton:hover {
+		cursor: pointer;
+	}
