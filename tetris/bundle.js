@@ -63,11 +63,193 @@
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+class DrawingFunctions {
+
+  constructor(game) {
+
+    this.drawGrid = this.drawGrid.bind(game);
+    this.drawNextPiece = this.drawNextPiece.bind(game);
+    this.drawPiece = this.drawPiece.bind(game);
+    this.drawIntro = this.drawIntro.bind(game);
+    this.drawOutro = this.drawOutro.bind(game);
+    this.printScore = this.printScore.bind(game);
+
+  }
+
+  drawGrid() {
+
+    this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+
+    // ctx.fillStyle = "orange";
+    // ctx.fillRect(0,0,canvas.width, canvas.height);
+
+    var x = this.outerBorder;
+    var y = this.outerBorder;
+
+    this.ctx.fillStyle = this.borderColor;
+    this.ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    this.grid.forEach((row) => {
+
+      row.forEach((square) => {
+
+        this.ctx.fillStyle = square;
+        this.ctx.fillRect(x,y,this.cubeSide,this.cubeSide);
+        x += this.cubeSide + this.border;
+
+      });
+
+      y += this.cubeSide + this.border;
+      x = this.outerBorder;
+      this.drawPiece();
+
+      this.drawNextPiece();
+
+      this.printScore();
+
+      if (!this.begun) {
+        this.drawIntro();
+      }
+
+      if (this.over) {
+        this.drawOutro();
+      }
+
+    });
+
+  }
+
+  drawNextPiece() {
+
+    this.ctx.fillStyle = this.borderColor;
+    let xCoord = this.canvasWidth + this.cubeSide;
+    let yCoord = this.cubeSide;
+    let sideLength = (this.cubeSide*4)+(this.border*3)+(this.outerBorder*2);
+    this.ctx.fillRect(xCoord,yCoord,sideLength,sideLength);
+
+    xCoord += this.outerBorder;
+    yCoord += this.outerBorder;
+    this.ctx.fillStyle = this.emptyColor;
+
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 4; j++) {
+        this.ctx.fillRect(xCoord,yCoord,this.cubeSide,this.cubeSide);
+        xCoord += this.cubeSide + this.border;
+      }
+      xCoord = this.canvasWidth + this.cubeSide + this.outerBorder;
+      yCoord += this.cubeSide + this.border;
+    }
+
+    for (let idx = 0; idx < 4; idx++) {
+      let x = this.nextPiece[0][idx][0];
+      let y = this.nextPiece[0][idx][1];
+      xCoord = this.canvasWidth + this.cubeSide + this.outerBorder;
+      yCoord = this.cubeSide + this.outerBorder;
+      this.ctx.fillStyle = this.nextPiece.color;
+      this.ctx.fillRect(xCoord+(x*(this.cubeSide + this.border)), yCoord+(y*(this.cubeSide + this.border)), this.cubeSide, this.cubeSide);
+    }
+
+  }
+
+  drawPiece() {
+    if (this.over) {
+      return;
+    }
+    if (!this.begun) {
+      return;
+    }
+    this.ctx.fillStyle = this.piece.color;
+    for (let idx = 0; idx < 4; idx++) {
+      let x = this.piece[this.piecePos][idx][0];
+      let y = this.piece[this.piecePos][idx][1];
+      this.ctx.fillRect(this.pieceX+(x*(this.cubeSide + this.border)), this.pieceY+(y*(this.cubeSide + this.border)), this.cubeSide, this.cubeSide);
+    }
+  }
+
+  drawIntro() {
+
+    let xCoord = 3*this.cubeSide + 3*this.border + this.outerBorder;
+    let yCoord = 7*this.cubeSide + 7*this.border + this.outerBorder;
+    let width = (this.sqrsAcross - 6)*(this.cubeSide+this.border) - this.border;
+    let height = 5*(this.cubeSide + this.border) - this.border;
+
+    this.ctx.fillStyle = "#888888";
+    this.ctx.fillRect(xCoord-this.outerBorder, yCoord-this.outerBorder, width+(2*this.outerBorder), height+(2*this.outerBorder));
+
+    this.ctx.fillStyle = "white";//"#4B0082";
+    this.ctx.fillRect(xCoord,yCoord,width,height);
+    this.ctx.font = '48px sans-serif';
+    this.ctx.fillStyle = "blue";
+    //width = 171; half width = about 85; height = 48; half height = 24;
+    // canvas width="514" height="642"
+
+    this.ctx.fillText('TETRIS', (this.canvasWidth/2)-85, (this.canvasHeight/2)-24);
+
+    this.ctx.fillStyle = "red";
+    this.ctx.font = '18px sans-serif';
+    //width: 100;
+    this.ctx.fillText('Click to play!', (this.canvasWidth/2)-50, (this.canvasHeight/2)+15);
+  }
+
+  drawOutro() {
+
+    let xCoord = 3*this.cubeSide + 3*this.border + this.outerBorder;
+    let yCoord = 7*this.cubeSide + 7*this.border + this.outerBorder;
+    let width = (this.sqrsAcross - 6)*(this.cubeSide+this.border) - this.border;
+    let height = 5*(this.cubeSide + this.border) - this.border;
+
+    this.ctx.fillStyle = "#888888";
+    this.ctx.fillRect(xCoord-this.outerBorder, yCoord-this.outerBorder, width+(2*this.outerBorder), height+(2*this.outerBorder));
+
+    this.ctx.fillStyle = "white";//"#4B0082";
+    this.ctx.fillRect(xCoord,yCoord,width,height);
+    this.ctx.font = '30px sans-serif';
+    this.ctx.fillStyle = "black";
+    //width = 236; half width = about 118; height = 48; half height = 24;
+    // canvas width="514" height="642"
+    this.ctx.fillStyle = "red";
+    this.ctx.fillText('GAME OVER', xCoord+6, yCoord+70);
+
+    this.ctx.fillStyle = "blue";
+    this.ctx.font = '18px sans-serif';
+    //width: 94;
+    this.ctx.fillText('Play again?', (this.canvasWidth/2)-45, (this.canvasHeight/2)+5);
+  }
+
+  printScore() {
+    let x = this.canvasWidth + this.cubeSide*1.5;
+    let y = (this.cubeSide*6.5) + (this.border*3) + (this.outerBorder*2);
+
+    this.ctx.font = '24px sans-serif';
+
+    this.ctx.fillStyle = "green";
+    this.ctx.fillText(`Level ${this.level}`, x, y);
+
+    y += 30;
+
+    this.ctx.fillStyle = "blue";
+    this.ctx.fillText(`Score: ${this.score}`, x, y);
+
+    y += 30;
+
+    this.ctx.fillStyle = "red";
+    this.ctx.fillText(`Rows: ${this.numRows}`, x, y);
+  }
+
+}
+
+module.exports = DrawingFunctions;
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 // each piece is composed of four squares and has four possible rotations,
@@ -84,516 +266,416 @@
 // [_,_,x,_]  -->  [2,2]
 // [_,_,x,_]  -->  [2,3]
 
-var long = {};
-long[0] = [[0,1],[1,1],[2,1],[3,1]];
-long[1] = [[2,0],[2,1],[2,2],[2,3]];
-long[2] = [[0,2],[1,2],[2,2],[3,2]];
-long[3] = [[1,0],[1,1],[1,2],[1,3]];
-long.color = "green";
+class Pieces {
 
-var ell1 = {};
-ell1[0] = [[1,0],[1,1],[1,2],[0,2]];
-ell1[1] = [[0,0],[0,1],[1,1],[2,1]];
-ell1[2] = [[1,0],[2,0],[1,1],[1,2]];
-ell1[3] = [[0,1],[1,1],[2,1],[2,2]];
-ell1.color = "orange";
+  constructor() {
 
-var ell2 = {};
-ell2[0] = [[1,0],[1,1],[1,2],[2,2]];
-ell2[1] = [[0,1],[1,1],[2,1],[0,2]];
-ell2[2] = [[0,0],[1,0],[1,1],[1,2]];
-ell2[3] = [[2,0],[0,1],[1,1],[2,1]];
-ell2.color = "yellow";
+    this.long = {};
+    this.long[0] = [[0,1],[1,1],[2,1],[3,1]];
+    this.long[1] = [[2,0],[2,1],[2,2],[2,3]];
+    this.long[2] = [[0,2],[1,2],[2,2],[3,2]];
+    this.long[3] = [[1,0],[1,1],[1,2],[1,3]];
+    this.long.color = "green";
 
-var square = {};
-square[0] = [[0,0],[1,0],[0,1],[1,1]];
-square[1] = [[0,0],[1,0],[0,1],[1,1]];
-square[2] = [[0,0],[1,0],[0,1],[1,1]];
-square[3] = [[0,0],[1,0],[0,1],[1,1]];
-square.color = "#FF69B4"; // pink
+    this.ell1 = {};
+    this.ell1[0] = [[1,0],[1,1],[1,2],[0,2]];
+    this.ell1[1] = [[0,0],[0,1],[1,1],[2,1]];
+    this.ell1[2] = [[1,0],[2,0],[1,1],[1,2]];
+    this.ell1[3] = [[0,1],[1,1],[2,1],[2,2]];
+    this.ell1.color = "orange";
 
-var zag1 = {};
-zag1[0] = [[1,1],[2,1],[0,2],[1,2]];
-zag1[1] = [[0,0],[0,1],[1,1],[1,2]];
-zag1[2] = [[1,0],[2,0],[0,1],[1,1]];
-zag1[3] = [[1,0],[1,1],[2,1],[2,2]];
-zag1.color = "purple";
+    this.ell2 = {};
+    this.ell2[0] = [[1,0],[1,1],[1,2],[2,2]];
+    this.ell2[1] = [[0,1],[1,1],[2,1],[0,2]];
+    this.ell2[2] = [[0,0],[1,0],[1,1],[1,2]];
+    this.ell2[3] = [[2,0],[0,1],[1,1],[2,1]];
+    this.ell2.color = "yellow";
 
-var tee = {};
-tee[0] = [[0,1],[1,1],[2,1],[1,2]];
-tee[1] = [[1,0],[0,1],[1,1],[1,2]];
-tee[2] = [[1,0],[0,1],[1,1],[2,1]];
-tee[3] = [[1,0],[1,1],[1,2],[2,1]];
-tee.color = "red";
+    this.square = {};
+    this.square[0] = [[0,0],[1,0],[0,1],[1,1]];
+    this.square[1] = [[0,0],[1,0],[0,1],[1,1]];
+    this.square[2] = [[0,0],[1,0],[0,1],[1,1]];
+    this.square[3] = [[0,0],[1,0],[0,1],[1,1]];
+    this.square.color = "#FF69B4"; // pink
 
-var zag2 = {};
-zag2[0] = [[0,1],[1,1],[1,2],[2,2]];
-zag2[1] = [[1,0],[0,1],[1,1],[0,2]];
-zag2[2] = [[0,0],[1,0],[1,1],[2,1]];
-zag2[3] = [[2,0],[1,1],[2,1],[1,2]];
-zag2.color = "blue";
+    this.zag1 = {};
+    this.zag1[0] = [[1,1],[2,1],[0,2],[1,2]];
+    this.zag1[1] = [[0,0],[0,1],[1,1],[1,2]];
+    this.zag1[2] = [[1,0],[2,0],[0,1],[1,1]];
+    this.zag1[3] = [[1,0],[1,1],[2,1],[2,2]];
+    this.zag1.color = "purple";
 
-var pieces = [long, ell1, ell2, square, zag1, tee, zag2];
+    this.tee = {};
+    this.tee[0] = [[0,1],[1,1],[2,1],[1,2]];
+    this.tee[1] = [[1,0],[0,1],[1,1],[1,2]];
+    this.tee[2] = [[1,0],[0,1],[1,1],[2,1]];
+    this.tee[3] = [[1,0],[1,1],[1,2],[2,1]];
+    this.tee.color = "red";
 
-module.exports = pieces;
+    this.zag2 = {};
+    this.zag2[0] = [[0,1],[1,1],[1,2],[2,2]];
+    this.zag2[1] = [[1,0],[0,1],[1,1],[0,2]];
+    this.zag2[2] = [[0,0],[1,0],[1,1],[2,1]];
+    this.zag2[3] = [[2,0],[1,1],[2,1],[1,2]];
+    this.zag2.color = "blue";
+
+    this.pieces = [this.long, this.ell1, this.ell2, this.square, this.zag1, this.tee, this.zag2];
+
+  }
+
+}
+
+module.exports = Pieces;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var sqrsAcross = 12;
-var sqrsTall = 20;
-var cubeSide = 30;
-var outerBorder = 10;
-var border = 3;
-var borderDiff = outerBorder - border;
 
-var canvas = document.getElementById("myCanvas");
-var ctx = canvas.getContext("2d");
-var canvasWidth = ((cubeSide + border) * sqrsAcross) + border + borderDiff*2;
-var canvasHeight = ((cubeSide + border) * sqrsTall) + border + borderDiff*2;
+const Pieces = __webpack_require__(1);
+const DrawingFunctions = __webpack_require__(0);
 
-var upPressed = false;
-var downPressed = false;
-var leftPressed = false;
-var rightPressed = false;
+class Game {
 
-var rotateDelay;
-var sideDelay;
-var downDelay;
+  constructor() {
 
-var pieceYGrid;
-var pieceXGrid;
-var pieceY;
-var pieceX;
-var pieceTimer;
-var piecePos;
+    this.sqrsAcross = 12;
+    this.sqrsTall = 20;
+    this.cubeSide = 30;
+    this.outerBorder = 10;
+    this.border = 3;
+    this.borderDiff = this.outerBorder - this.border;
 
-var begun = false;
-var over = false;
+    this.canvas = document.getElementById("myCanvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.canvasWidth = ((this.cubeSide + this.border) * this.sqrsAcross) + this.border + this.borderDiff*2;
+    this.canvasHeight = ((this.cubeSide + this.border) * this.sqrsTall) + this.border + this.borderDiff*2;
 
-var pieceWorth = 10;
-var rowWorth = 100;
+    this.upPressed = false;
+    this.downPressed = false;
+    this.leftPressed = false;
+    this.rightPressed = false;
 
-var score;
-var numRows;
+    this.begun = false;
+    this.over = false;
 
-var pieces = __webpack_require__(0);
-var piece;
-var nextPiece;
-var grid;
+    this.pieceWorth = 10;
+    this.rowWorth = 100;
 
-var emptyColor = "#DDDDDD"; // grey
-var borderColor = "#444444";
+    let pieceSet = new Pieces();
+    this.pieces = pieceSet.pieces;
 
-resetVars();
+    this.emptyColor = "#DDDDDD"; // grey
+    this.borderColor = "#444444";
 
-function createRow() {
-  return Array.apply(null, Array(sqrsAcross)).map(String.prototype.valueOf,emptyColor);
-}
+    this.startSpeed = 50;
 
-function createGrid() {
-  return Array.apply(null, Array(sqrsTall)).map( createRow );
-}
+    this.createRow = this.createRow.bind(this);
+    this.createGrid = this.createGrid.bind(this);
+    this.resetVars = this.resetVars.bind(this);
+    this.play = this.play.bind(this);
 
-function resetVars() {
+    let draw = new DrawingFunctions(this);
+    this.drawGrid = draw.drawGrid;
+    this.drawNextPiece = draw.drawNextPiece;
+    this.drawPiece = draw.drawPiece;
+    this.drawIntro = draw.drawIntro;
+    this.drawOutro = draw.drawOutro;
+    this.printScore = draw.printScore;
 
-  rotateDelay = 0;
-  sideDelay = 0;
-  downDelay = 0;
+    this.pieceIntersecting = this.pieceIntersecting.bind(this);
+    this.pieceCheck = this.pieceCheck.bind(this);
+    this.pieceStop = this.pieceStop.bind(this);
+    this.newPiece = this.newPiece.bind(this);
+    this.checkRows = this.checkRows.bind(this);
+    this.deleteRow = this.deleteRow.bind(this);
+    this.startGame = this.startGame.bind(this);
+    this.gameOver = this.gameOver.bind(this);
+    this.pieceDown = this.pieceDown.bind(this);
+    this.pause = this.pause.bind(this);
+    this.resume = this.resume.bind(this);
+    this.keyDownHandler = this.keyDownHandler.bind(this);
+    this.keyUpHandler = this.keyUpHandler.bind(this);
+    this.levelUp = this.levelUp.bind(this);
 
-  score = 0;
-  numRows = 0;
 
-  pieceYGrid = 0;
-  pieceXGrid = Math.floor(Math.random() * (sqrsAcross-3));
-  pieceY = outerBorder;
-  pieceX = (pieceXGrid) * (cubeSide + border) + outerBorder;
-  pieceTimer = 0;
-  piecePos = 0;
-  piece = pieces[Math.floor(Math.random() * 7)];
-  nextPiece = pieces[Math.floor(Math.random() * 7)];
+    this.resetVars();
 
-  grid = createGrid();
+    document.addEventListener("click", this.startGame, false);
+    document.addEventListener("keydown", this.keyDownHandler, false);
+    document.addEventListener("keyup", this.keyUpHandler, false);
 
-}
+    this.drawGrid();
 
-function play() {
-
-  pieceCheck("down");
-
-  if (rotateDelay > 0) {
-    rotateDelay -= 1;
   }
 
-  if (sideDelay > 0) {
-    sideDelay -= 1;
+
+  createRow() {
+    return Array.apply(null, Array(this.sqrsAcross)).map(String.prototype.valueOf,this.emptyColor);
   }
 
-  if (downDelay > 0) {
-    downDelay -= 1;
+  createGrid() {
+    return Array.apply(null, Array(this.sqrsTall)).map( this.createRow );
   }
 
-  if (leftPressed && sideDelay === 0) {
-    pieceX -= (cubeSide + border);
-    pieceXGrid -= 1;
-    sideDelay = 3;
+  resetVars() {
+
+    this.rotateDelay = 0;
+    this.sideDelay = 0;
+    this.downDelay = 0;
+
+    this.score = 0;
+    this.numRows = 0;
+    this.level = 1;
+    this.speed = this.startSpeed;
+
+    this.pieceYGrid = 0;
+    this.pieceXGrid = Math.floor(Math.random() * (this.sqrsAcross-3));
+    this.pieceY = this.outerBorder;
+    this.pieceX = (this.pieceXGrid) * (this.cubeSide + this.border) + this.outerBorder;
+    this.pieceTimer = 0;
+    this.piecePos = 0;
+    this.piece = this.pieces[Math.floor(Math.random() * 7)];
+    this.nextPiece = this.pieces[Math.floor(Math.random() * 7)];
+
+    this.grid = this.createGrid();
+
   }
 
-  pieceCheck("left");
+  play() {
 
-  if (rightPressed && sideDelay === 0) {
-    pieceX += (cubeSide + border);
-    pieceXGrid += 1;
-    sideDelay = 3;
-  }
+    this.pieceCheck("down");
 
-  pieceCheck("right");
-
-  if (downPressed && downDelay === 0) {
-    pieceY += (cubeSide + border);
-    pieceYGrid += 1;
-    downDelay = 3;
-  }
-
-  pieceCheck("down");
-
-  if (upPressed && piecePos < 3 && rotateDelay === 0) {
-    piecePos += 1;
-    rotateDelay = 3;
-  } else if (upPressed & piecePos >= 3 && rotateDelay === 0) {
-    piecePos = 0;
-    rotateDelay = 3;
-  }
-
-  pieceCheck("rot");
-
-  checkRows();
-
-  drawGrid();
-
-}
-
-function drawGrid() {
-
-  ctx.clearRect(0,0, canvas.width, canvas.height);
-
-  // ctx.fillStyle = "orange";
-  // ctx.fillRect(0,0,canvas.width, canvas.height);
-
-  var x = outerBorder;
-  var y = outerBorder;
-
-  ctx.fillStyle = borderColor;
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-  grid.forEach((row) => {
-
-    row.forEach((square) => {
-
-      ctx.fillStyle = square;
-      ctx.fillRect(x,y,cubeSide,cubeSide);
-      x += cubeSide + border;
-
-    });
-
-    y += cubeSide + border;
-    x = outerBorder;
-    drawPiece();
-
-    drawNextPiece();
-
-    printScore();
-
-    if (!begun) {
-      drawIntro();
+    if (this.rotateDelay > 0) {
+      this.rotateDelay -= 1;
     }
 
-    if (over) {
-      drawOutro();
+    if (this.sideDelay > 0) {
+      this.sideDelay -= 1;
     }
 
-  });
-
-}
-
-function drawNextPiece() {
-
-  ctx.fillStyle = borderColor;
-  let xCoord = canvasWidth + cubeSide;
-  let yCoord = cubeSide;
-  let sideLength = (cubeSide*4)+(border*3)+(outerBorder*2);
-  ctx.fillRect(xCoord,yCoord,sideLength,sideLength);
-
-  xCoord += outerBorder;
-  yCoord += outerBorder;
-  ctx.fillStyle = emptyColor;
-
-  for (let i = 0; i < 4; i++) {
-    for (let j = 0; j < 4; j++) {
-      ctx.fillRect(xCoord,yCoord,cubeSide,cubeSide);
-      xCoord += cubeSide + border;
+    if (this.downDelay > 0) {
+      this.downDelay -= 1;
     }
-    xCoord = canvasWidth + cubeSide + outerBorder;
-    yCoord += cubeSide + border;
-  }
 
-  for (let idx = 0; idx < 4; idx++) {
-    let x = nextPiece[0][idx][0];
-    let y = nextPiece[0][idx][1];
-    xCoord = canvasWidth + cubeSide + outerBorder;
-    yCoord = cubeSide + outerBorder;
-    ctx.fillStyle = nextPiece.color;
-    ctx.fillRect(xCoord+(x*(cubeSide + border)), yCoord+(y*(cubeSide + border)), cubeSide, cubeSide);
-  }
-
-}
-
-function drawPiece() {
-  if (over) {
-    return;
-  }
-  if (!begun) {
-    return;
-  }
-  ctx.fillStyle = piece.color;
-  for (let idx = 0; idx < 4; idx++) {
-    let x = piece[piecePos][idx][0];
-    let y = piece[piecePos][idx][1];
-    ctx.fillRect(pieceX+(x*(cubeSide + border)), pieceY+(y*(cubeSide + border)), cubeSide, cubeSide);
-  }
-}
-
-function drawIntro() {
-
-  let xCoord = 3*cubeSide + 3*border + outerBorder;
-  let yCoord = 7*cubeSide + 7*border + outerBorder;
-  let width = (sqrsAcross - 6)*(cubeSide+border) - border;
-  let height = 5*(cubeSide + border) - border;
-
-  ctx.fillStyle = "#888888";
-  ctx.fillRect(xCoord-outerBorder, yCoord-outerBorder, width+(2*outerBorder), height+(2*outerBorder));
-
-  ctx.fillStyle = "white";//"#4B0082";
-  ctx.fillRect(xCoord,yCoord,width,height);
-  ctx.font = '48px sans-serif';
-  ctx.fillStyle = "blue";
-  //width = 171; half width = about 85; height = 48; half height = 24;
-  // canvas width="514" height="642"
-
-  ctx.fillText('TETRIS', (canvasWidth/2)-85, (canvasHeight/2)-24);
-
-  ctx.fillStyle = "red";
-  ctx.font = '18px sans-serif';
-  //width: 100;
-  ctx.fillText('Click to play!', (canvasWidth/2)-50, (canvasHeight/2)+15);
-}
-
-function drawOutro() {
-
-  let xCoord = 3*cubeSide + 3*border + outerBorder;
-  let yCoord = 7*cubeSide + 7*border + outerBorder;
-  let width = (sqrsAcross - 6)*(cubeSide+border) - border;
-  let height = 5*(cubeSide + border) - border;
-
-  ctx.fillStyle = "#888888";
-  ctx.fillRect(xCoord-outerBorder, yCoord-outerBorder, width+(2*outerBorder), height+(2*outerBorder));
-
-  ctx.fillStyle = "white";//"#4B0082";
-  ctx.fillRect(xCoord,yCoord,width,height);
-  ctx.font = '30px sans-serif';
-  ctx.fillStyle = "black";
-  //width = 236; half width = about 118; height = 48; half height = 24;
-  // canvas width="514" height="642"
-  ctx.fillStyle = "red";
-  ctx.fillText('GAME OVER', xCoord+6, yCoord+70);
-
-  ctx.fillStyle = "blue";
-  ctx.font = '18px sans-serif';
-  //width: 94;
-  ctx.fillText('Play again?', (canvasWidth/2)-45, (canvasHeight/2)+5);
-}
-
-function pieceIntersecting() {
-  let intersecting = false;
-  for (let idx = 0; idx < 4; idx++) {
-    let x = piece[piecePos][idx][0] + pieceXGrid;
-    let y = piece[piecePos][idx][1] + pieceYGrid;
-    if (y >= sqrsTall) {
-      intersecting = true;
-    } else if (x >= sqrsAcross) {
-      intersecting = true;
-    } else if (x < 0) {
-      intersecting = true;
-    } else if (grid[y][x] != emptyColor) {
-      intersecting = true;
+    if (this.leftPressed && this.sideDelay === 0) {
+      this.pieceX -= (this.cubeSide + this.border);
+      this.pieceXGrid -= 1;
+      this.sideDelay = 3;
     }
-  }
-  return intersecting;
-}
 
-function pieceCheck(direction) {
-  if (pieceIntersecting()) {
-    if (direction === "left") {
-      pieceX += (cubeSide + border);
-      pieceXGrid += 1;
-    } else if (direction === "right") {
-      pieceX -= (cubeSide + border);
-      pieceXGrid -= 1;
-    } else if (direction === "down") {
-      pieceY -= (cubeSide + border);
-      pieceYGrid -= 1;
-      // only creates a new piece if move would intersect on the bottom
-      pieceStop();
-      newPiece();
-    } else if (direction === "rot") {
-      piecePos -= 1;
-      if (piecePos < 0) {
-        piecePos = 3;
+    this.pieceCheck("left");
+
+    if (this.rightPressed && this.sideDelay === 0) {
+      this.pieceX += (this.cubeSide + this.border);
+      this.pieceXGrid += 1;
+      this.sideDelay = 3;
+    }
+
+    this.pieceCheck("right");
+
+    if (this.downPressed && this.downDelay === 0) {
+      this.pieceY += (this.cubeSide + this.border);
+      this.pieceYGrid += 1;
+      this.downDelay = 3;
+    }
+
+    this.pieceCheck("down");
+
+    if (this.upPressed && this.piecePos < 3 && this.rotateDelay === 0) {
+      this.piecePos += 1;
+      this.rotateDelay = 3;
+    } else if (this.upPressed & this.piecePos >= 3 && this.rotateDelay === 0) {
+      this.piecePos = 0;
+      this.rotateDelay = 3;
+    }
+
+    this.pieceCheck("rot");
+
+    this.checkRows();
+
+    this.drawGrid();
+
+  }
+
+  checkRows() {
+    for (let row = 0; row < this.sqrsTall; row++) {
+      let white = false;
+      for (let col = 0; col < this.sqrsAcross; col++) {
+        if (this.grid[row][col] === this.emptyColor) {
+          white = true;
+        }
+      }
+      if (!white) {
+        this.deleteRow(row);
       }
     }
   }
-}
 
-function pieceStop() {
-  for (let idx = 0; idx < 4; idx++) {
-    let x = piece[piecePos][idx][0] + pieceXGrid;
-    let y = piece[piecePos][idx][1] + pieceYGrid;
-    grid[y][x] = piece.color;
-  }
-  score += pieceWorth;
-}
-
-function newPiece() {
-  drawPiece();
-  pieceYGrid = 0;
-  pieceXGrid = Math.floor(Math.random() * (sqrsAcross-3));
-  pieceY = outerBorder;
-  pieceX = (pieceXGrid) * (cubeSide + border) + outerBorder;
-  pieceTimer = 0;
-  piecePos = 0;
-  piece = nextPiece;
-  nextPiece = pieces[Math.floor(Math.random() * 7)];
-  if (pieceIntersecting()) {
-    gameOver();
-  }
-}
-
-function checkRows() {
-  for (let row = 0; row < sqrsTall; row++) {
-    let white = false;
-    for (let col = 0; col < sqrsAcross; col++) {
-      if (grid[row][col] === emptyColor) {
-        white = true;
+  pieceIntersecting() {
+    let intersecting = false;
+    for (let idx = 0; idx < 4; idx++) {
+      let x = this.piece[this.piecePos][idx][0] + this.pieceXGrid;
+      let y = this.piece[this.piecePos][idx][1] + this.pieceYGrid;
+      if (y >= this.sqrsTall) {
+        intersecting = true;
+      } else if (x >= this.sqrsAcross) {
+        intersecting = true;
+      } else if (x < 0) {
+        intersecting = true;
+      } else if (this.grid[y][x] != this.emptyColor) {
+        intersecting = true;
       }
     }
-    if (!white) {
-      deleteRow(row);
+    return intersecting;
+  }
+
+  pieceCheck(direction) {
+    if (this.over) {
+      return;
+    }
+    if (this.pieceIntersecting()) {
+      if (direction === "left") {
+        this.pieceX += (this.cubeSide + this.border);
+        this.pieceXGrid += 1;
+      } else if (direction === "right") {
+        this.pieceX -= (this.cubeSide + this.border);
+        this.pieceXGrid -= 1;
+      } else if (direction === "down") {
+        this.pieceY -= (this.cubeSide + this.border);
+        this.pieceYGrid -= 1;
+        // only creates a new piece if move would intersect on the bottom
+        this.pieceStop();
+        this.newPiece();
+      } else if (direction === "rot") {
+        this.piecePos -= 1;
+        if (this.piecePos < 0) {
+          this.piecePos = 3;
+        }
+      }
     }
   }
-}
 
-function deleteRow(row) {
-  grid.splice(row, 1);
-  grid.unshift(createRow());
-  numRows += 1;
-  score += rowWorth;
-}
-
-function startGame() {
-  document.removeEventListener("click", startGame);
-  document.addEventListener("click", pause);
-  over = false;
-  begun = true;
-  playInterval = setInterval(play, 50);
-  downInterval = setInterval(pieceDown, 50);
-  resetVars();
-}
-
-function gameOver() {
-  over = true;
-  document.removeEventListener("click", pause);
-  clearInterval(playInterval);
-  clearInterval(downInterval);
-  document.addEventListener("click", startGame, false);
-}
-
-function pieceDown() {
-  pieceTimer += 1;
-
-  if (pieceTimer === 10) {
-    pieceY += (cubeSide + border);
-    pieceYGrid += 1;
-    pieceTimer = 0;
+  pieceStop() {
+    for (let idx = 0; idx < 4; idx++) {
+      let x = this.piece[this.piecePos][idx][0] + this.pieceXGrid;
+      let y = this.piece[this.piecePos][idx][1] + this.pieceYGrid;
+      this.grid[y][x] = this.piece.color;
+    }
+    this.score += this.pieceWorth;
   }
+
+  newPiece() {
+    this.drawPiece();
+    this.pieceYGrid = 0;
+    this.pieceXGrid = Math.floor(Math.random() * (this.sqrsAcross-3));
+    this.pieceY = this.outerBorder;
+    this.pieceX = (this.pieceXGrid) * (this.cubeSide + this.border) + this.outerBorder;
+    this.pieceTimer = 0;
+    this.piecePos = 0;
+    this.piece = this.nextPiece;
+    this.nextPiece = this.pieces[Math.floor(Math.random() * 7)];
+    if (this.pieceIntersecting()) {
+      this.gameOver();
+    }
+  }
+
+  deleteRow(row) {
+    this.grid.splice(row, 1);
+    this.grid.unshift(this.createRow());
+    this.numRows += 1;
+    this.score += this.rowWorth;
+    if (this.numRows % 5 === 0) {
+      this.levelUp();
+    }
+  }
+
+  startGame() {
+    document.removeEventListener("click", this.startGame);
+    document.addEventListener("click", this.pause);
+    this.resetVars();
+    this.over = false;
+    this.begun = true;
+    this.playInterval = setInterval(this.play, 50);
+    this.downInterval = setInterval(this.pieceDown, this.speed);
+  }
+
+  gameOver() {
+    this.over = true;
+    document.removeEventListener("click", this.pause);
+    clearInterval(this.playInterval);
+    clearInterval(this.downInterval);
+    document.addEventListener("click", this.startGame, false);
+  }
+
+  pieceDown() {
+    this.pieceTimer += 1;
+
+    if (this.pieceTimer === 10) {
+      this.pieceY += (this.cubeSide + this.border);
+      this.pieceYGrid += 1;
+      this.pieceTimer = 0;
+    }
+  }
+
+  pause() {
+    document.removeEventListener("click", this.pause);
+    document.addEventListener("click", this.resume);
+    clearInterval(this.downInterval);
+    clearInterval(this.playInterval);
+  }
+
+  resume() {
+    document.removeEventListener("click", this.resume);
+    document.addEventListener("click", this.pause);
+    this.playInterval = setInterval(this.play, 50);
+    this.downInterval = setInterval(this.pieceDown, this.speed);
+  }
+
+  levelUp() {
+    if (this.speed > 5) {
+      this.speed -= 5;
+      clearInterval(this.downInterval);
+      this.downInterval = setInterval(this.pieceDown, this.speed);
+      this.level += 1;
+    }
+  }
+
+
+  keyDownHandler(e) {
+    if(e.keyCode == 39) {
+      this.rightPressed = true;
+    }
+    else if(e.keyCode == 37) {
+      this.leftPressed = true;
+    }
+    else if(e.keyCode == 38) {
+      this.upPressed = true;
+    }
+    else if(e.keyCode == 40) {
+      this.downPressed = true;
+    }
+  }
+
+  keyUpHandler(e) {
+    if(e.keyCode == 39) {
+      this.rightPressed = false;
+    }
+    else if(e.keyCode == 37) {
+      this.leftPressed = false;
+    }
+    else if(e.keyCode == 38) {
+      this.upPressed = false;
+    }
+    else if(e.keyCode == 40) {
+      this.downPressed = false;
+    }
+  }
+
 }
 
-function pause() {
-  document.removeEventListener("click", pause);
-  document.addEventListener("click", resume);
-  clearInterval(downInterval);
-  clearInterval(playInterval);
-}
-
-function resume() {
-  document.removeEventListener("click", resume);
-  document.addEventListener("click", pause);
-  playInterval = setInterval(play, 50);
-  downInterval = setInterval(pieceDown, 50);
-}
-
-function printScore() {
-  let x = canvasWidth + cubeSide*1.5;
-  let y = (cubeSide*6.5) + (border*3) + (outerBorder*2);
-
-  ctx.font = '24px sans-serif';
-
-  ctx.fillStyle = "blue";
-  ctx.fillText(`Score: ${score}`, x, y);
-
-  y += 30;
-
-  ctx.fillStyle = "red";
-  ctx.fillText(`Rows: ${numRows}`, x, y);
-}
-
-
-function keyDownHandler(e) {
-  if(e.keyCode == 39) {
-    rightPressed = true;
-  }
-  else if(e.keyCode == 37) {
-    leftPressed = true;
-  }
-  else if(e.keyCode == 38) {
-    upPressed = true;
-  }
-  else if(e.keyCode == 40) {
-    downPressed = true;
-  }
-}
-
-function keyUpHandler(e) {
-  if(e.keyCode == 39) {
-    rightPressed = false;
-  }
-  else if(e.keyCode == 37) {
-    leftPressed = false;
-  }
-  else if(e.keyCode == 38) {
-    upPressed = false;
-  }
-  else if(e.keyCode == 40) {
-    downPressed = false;
-  }
-}
-
-document.addEventListener("click", startGame, false);
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-
-drawGrid();
+game = new Game();
 
 
 /***/ })
