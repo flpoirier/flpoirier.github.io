@@ -10,7 +10,7 @@ class Asteroid {
     this.endPoint = this.canvasWidth - this.endMargin;
 
     this.asteroidColors = ["red", "orange", "yellow", "green", "blue", "purple"];
-    this.asteroidSpeed = 10;
+    this.asteroidSpeed = 20;
     this.asteroidRad = 15;
     this.asteroidPush = 60;
     this.intersectionMaxTime = 15;
@@ -69,8 +69,8 @@ class Asteroid {
 
   dudeIntersecting(asteroid) {
 
-    this.ctx.lineWidth = 0.01;
-    this.ctx.strokeStyle = "white";
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = 'rgba(00,00,00,0)';
     this.ctx.beginPath();
     this.ctx.moveTo(this.dude.tlx,this.dude.tly);
     this.ctx.lineTo(this.dude.trx,this.dude.try);

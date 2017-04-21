@@ -48,6 +48,7 @@ class Game {
     this.time = this.maxTime;
     this.minsAndSecs = "";
 
+    this.started = false;
     this.playing = false;
     this.gameOver = false;
     this.gameWon = false;
@@ -59,15 +60,27 @@ class Game {
     this.keyUpHandler = this.keyUpHandler.bind(this);
     this.timeString = this.timeString.bind(this);
     this.timeTick = this.timeTick.bind(this);
+    this.drawTime = this.drawTime.bind(this);
     this.drawSky = this.drawSky.bind(this);
     this.drawStars = this.drawStars.bind(this);
     this.drawFront = this.drawFront.bind(this);
     this.play = this.play.bind(this);
+    this.eraseStars = this.eraseStars.bind(this);
+    this.drawWon = this.drawWon.bind(this);
+    this.drawLost = this.drawLost.bind(this);
 
     this.dude.gameWon = this.gameWon;
     this.dude.youWon = this.youWon;
     this.dude.youLose = this.youLose;
     this.dude.time = this.time;
+
+    this.erase = this.erase.bind(this);
+    this.erasing = null;
+    this.fullyRewound = this.fullyRewound.bind(this);
+    this.restartGame = this.restartGame.bind(this);
+
+    this.timeString();
+    this.stars.starConstructor();
   }
 
   youLose() {
@@ -150,7 +163,14 @@ class Game {
     this.timeString();
   }
 
+  drawTime() {
+    this.ctx3.fillStyle = "white";
+    this.ctx3.font = "30px sans-serif";
+    this.ctx3.fillText(`${this.minsAndSecs}`, 40, 60);
+  }
+
   drawSky() {
+    this.ctx1.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     this.ctx1.fillStyle = `rgb(${this.sun.red},${this.sun.green},${this.sun.blue})`;
     this.ctx1.fillRect(0,0,this.canvasWidth,this.canvasHeight);
   }
@@ -175,6 +195,19 @@ class Game {
 
     }
 
+  }
+
+  eraseStars() {
+
+    this.stars.decrementStars();
+
+    let star1 = this.stars.stars[this.stars.star1Idx];
+    let rad = star1.starRad;
+    this.ctx2.clearRect(star1.starX-rad, star1.starY-rad, rad*2, rad*2);
+
+    let star2 = this.stars.stars[this.stars.star2Idx];
+    rad = star2.starRad;
+    this.ctx2.clearRect(star2.starX-rad, star2.starY-rad, rad*2, rad*2);
   }
 
   drawFront() {
@@ -215,6 +248,12 @@ class Game {
     this.ctx3.beginPath();
     this.ctx3.arc(this.sun.sunX, this.sun.sunY, this.sun.sunRad, 0, 2 * Math.PI);
     this.ctx3.fill();
+
+    if (this.gameWon) {
+      this.drawWon();
+    } else if (this.gameLost) {
+      this.drawLost();
+    }
 
     // bonus sun logic:
     // let nickX = this.sun.sunX - this.nickRad;
@@ -264,12 +303,12 @@ class Game {
     // this.ctx3.arc(this.dude.dudeX, this.dude.dudeY, this.dude.dudeRad, 0, 2 * Math.PI);
     // this.ctx3.fill();
 
-    let tiltAngle = dudeAngle - Math.PI/2
+    let tiltAngle = dudeAngle - Math.PI/2;
 
     this.ctx3.translate(this.dude.dudeX, translatedDudeY);
     this.ctx3.rotate(tiltAngle);
 
-    if (this.playing) {
+    if (this.started) {
       this.ctx3.drawImage(this.sprite, 0, 0, this.dude.dudeWidth, this.dude.dudeHeight);
     }
 
@@ -290,16 +329,6 @@ class Game {
 
     this.dude.blx = this.dude.brx - r * Math.cos(tiltAngle);
     this.dude.bly = this.dude.bry - r * Math.sin(tiltAngle);
-
-    // this.ctx3.lineWidth = 3;
-    // this.ctx3.strokeStyle = "white";
-    // this.ctx3.beginPath();
-    // this.ctx3.moveTo(this.dude.tlx,this.dude.tly);
-    // this.ctx3.lineTo(this.dude.trx,this.dude.try);
-    // this.ctx3.lineTo(this.dude.brx,this.dude.bry);
-    // this.ctx3.lineTo(this.dude.blx,this.dude.bly);
-    // this.ctx3.lineTo(this.dude.tlx,this.dude.tly);
-    // this.ctx3.stroke();
 
 
     this.asteroids.asteroids.forEach((asteroid) => {
@@ -348,18 +377,8 @@ class Game {
 
     });
 
-    this.ctx3.fillStyle = "white";
-    this.ctx3.font = "30px sans-serif";
-    this.ctx3.fillText(`${this.minsAndSecs}`, 40, 60);
-
-    if (this.gameWon) {
-      this.ctx3.fillStyle = "white";
-      this.ctx3.font = "60px sans-serif";
-      this.ctx3.fillText("You won!", (this.canvasWidth / 2) - 125, this.canvasHeight / 2);
-    } else if (this.gameLost) {
-      this.ctx3.fillStyle = "white";
-      this.ctx3.font = "60px sans-serif";
-      this.ctx3.fillText("You lost!", (this.canvasWidth / 2) - 125, this.canvasHeight / 2);
+    if (this.playing && !this.gameOver) {
+      this.drawTime();
     }
 
     if (!this.playing) {
@@ -385,35 +404,103 @@ class Game {
       this.ctx3.fill();
     }
 
+    if (!this.erasing && (this.gameWon || this.gameLost)) {
+      this.erasing = setTimeout(this.erase, 2000);
+    }
+
   }
 
   // end of draw function
 
+  drawWon() {
+    // this.ctx3.fillStyle = "white";
+    // this.ctx3.font = "60px sans-serif";
+    // this.ctx3.fillText("You won!", (this.canvasWidth / 2) - 125, this.canvasHeight / 2);
+    this.ctx3.fillStyle = "orange";
+    this.ctx3.font = "bold 15px sans-serif";
+    this.ctx3.fillText("YOU", this.sun.sunX - 15, this.sun.sunY + 1);
+    this.ctx3.fillText("WIN", this.sun.sunX - 14, this.sun.sunY + 14);
+  }
+
+  drawLost() {
+    // this.ctx3.fillStyle = "white";
+    // this.ctx3.font = "60px sans-serif";
+    // this.ctx3.fillText("You lost!", (this.canvasWidth / 2) - 125, this.canvasHeight / 2);
+    this.ctx3.fillStyle = "orange";
+    this.ctx3.font = "bold 12px sans-serif";
+    this.ctx3.fillText("YOU", this.sun.sunX - 13, this.sun.sunY - 1);
+    this.ctx3.fillText("LOSE", this.sun.sunX - 16, this.sun.sunY + 10);
+  }
+
+  erase() {
+    clearInterval(this.drawingStars);
+    clearInterval(this.sunset);
+    clearInterval(this.makeAsteroids1);
+    clearInterval(this.makeAsteroids2);
+    clearInterval(this.dudeWalking);
+    clearInterval(this.tickingTime);
+    clearInterval(this.stringingTime);
+    clearInterval(this.checkingAsteroids);
+    this.erasingStars = setInterval(this.eraseStars, 30);
+    this.risingSun = setInterval(this.sun.sunup, 10);
+    this.moonwalking = setInterval(this.dude.moonwalk, 15);
+    this.rewinding = setInterval(this.fullyRewound, 30);
+    this.gameOver = true;
+  }
+
+  fullyRewound() {
+    if ((this.sun.sunY <= -this.sun.sunRad) && (this.dude.dudeX <= this.dude.endMargin)) {
+      setTimeout(this.restartGame, 500);
+      clearInterval(this.rewinding);
+    }
+  }
+
+  restartGame() {
+    this.gameOver = false;
+    this.gameWon = false;
+    this.gameLost = false;
+    this.playing = false;
+    this.erasing = null;
+    this.time = this.maxTime;
+    this.canvas3.addEventListener("click", this.play, false);
+    document.removeEventListener("keydown", this.keyDownHandler, false);
+    document.removeEventListener("keyup", this.keyUpHandler, false);
+    clearInterval(this.erasingStars);
+    clearInterval(this.risingSun);
+    clearInterval(this.moonwalking);
+    clearInterval(this.drawingFront);
+    clearInterval(this.drawingSky);
+    this.ctx2.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    this.drawFront();
+    this.drawSky();
+    this.stars.star1Idx = 0;
+    this.stars.star2Idx = 1;
+    this.asteroids.asteroids = [];
+    this.dude.gameWon = false;
+    this.dude.time = this.time;
+  }
+
   play() {
 
-    this.playing = true;
-
-    // this.soundicon.className = "fa fa-volume-up";
-    // this.music.play();
-
     this.timeString();
-    this.stars.starConstructor();
+    this.playing = true;
+    this.started = true;
 
     this.canvas3.removeEventListener("click", this.play, false);
     document.addEventListener("keydown", this.keyDownHandler, false);
     document.addEventListener("keyup", this.keyUpHandler, false);
 
-    setInterval(this.sun.sundown, 30);
+    this.sunset = setInterval(this.sun.sundown, 30);
     // setInterval(() => { this.stars.starshine(this.sun.blue); }, 30);
-    setInterval(this.dude.walking, 30);
-    setInterval(this.asteroids.collisionChecker, 30);
-    setInterval(this.asteroids.asteroidConstructor, 1000);
-    setInterval(this.asteroids.asteroidConstructor, 2500);
-    setInterval(this.timeTick, 1000);
-    setInterval(this.timeString, 1000);
-    setInterval(this.drawFront, 30);
-    setInterval(this.drawSky, 30);
-    setInterval(this.drawStars, 100);
+    this.dudeWalking = setInterval(this.dude.walking, 30);
+    this.checkingAsteroids = setInterval(this.asteroids.collisionChecker, 30);
+    this.makeAsteroids1 = setInterval(this.asteroids.asteroidConstructor, 1000);
+    this.makeAsteroids2 = setInterval(this.asteroids.asteroidConstructor, 2500);
+    this.tickingTime = setInterval(this.timeTick, 1000);
+    this.stringingTime = setInterval(this.timeString, 1000);
+    this.drawingFront = setInterval(this.drawFront, 30);
+    this.drawingSky = setInterval(this.drawSky, 30);
+    this.drawingStars = setInterval(this.drawStars, 100);
 
   }
 }

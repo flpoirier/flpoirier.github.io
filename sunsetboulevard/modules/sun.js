@@ -28,6 +28,7 @@ class Sun {
 
     this.skyColored = this.skyColored.bind(this);
     this.sundown = this.sundown.bind(this);
+    this.sunup = this.sunup.bind(this);
   }
 
   skyColored(r, g) {
@@ -43,7 +44,7 @@ class Sun {
   sundown() {
     this.sunset += 1;
 
-    if (this.sunset === 8 && this.blue > 40) {
+    if (this.sunset >= 8 && this.blue > 40) {
       this.red -= 1;
       this.green -= 2;
       this.blue -= 2;
@@ -54,6 +55,24 @@ class Sun {
       this.sunY += 1;
     } else {
       this.sunY += 2;
+    }
+  }
+
+  sunup() {
+
+    this.sunset += 1;
+
+    if (this.sunset >= 8 && this.blue < 254) {
+      this.red += 1;
+      this.green += 2;
+      this.blue += 2;
+      this.sunset = 0;
+    }
+
+    if (this.sunY > this.canvasHeight) {
+      this.sunY -= 2;
+    } else if (this.sunY > -this.sunRad){
+      this.sunY -= 1;
     }
   }
 
